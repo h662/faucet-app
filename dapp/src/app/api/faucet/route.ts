@@ -67,9 +67,13 @@ export async function POST(request: NextRequest) {
       faucetABI,
       wallet
     );
-    console.log(faucetContract);
 
-    return new NextResponse(JSON.stringify({ recipient, amount }));
+    const tx = await faucetContract.requestTokens(recipient, requestedAmount);
+    await tx.wait();
+
+    return new NextResponse(
+      JSON.stringify({ message: "토큰 지급 성공", txHash: tx.hash })
+    );
   } catch (error: any) {
     console.error("Faucet API 에러: ", error);
 
